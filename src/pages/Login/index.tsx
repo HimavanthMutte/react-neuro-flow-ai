@@ -20,12 +20,53 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<LoginErrors>({});
+  const [showPassword, setShowPassword] = useState(true);
+
+  const getEyeIcon = () => {
+    if (showPassword) {
+      return (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#6f1d1b"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      );
+    }
+    return (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#6f1d1b"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="m3 3 18 18" />
+        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+        <path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a15.8 15.8 0 0 1-3 3.9" />
+        <path d="M6.6 6.6C3.9 8.3 2.5 12 2.5 12s3.5 7 9.5 7a10 10 0 0 0 3.2-.5" />
+      </svg>
+    );
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setErrors({});
-
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -50,7 +91,23 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen flex-row bg-primary">
-      <div className="flex-1">Image</div>
+      <div className="flex flex-1 flex-col justify-center px-10 lg:px-16">
+        <div>
+          <h1 className="font-impact text-6xl leading-[0.9] tracking-wide text-tertiary sm:text-[100px] lg:text-[150px]">
+            NEURO
+            <br />
+            FLOW
+          </h1>
+
+          <div className="mt-6 h-1 w-20 rounded-full bg-accent" />
+
+          <p className="mt-5 max-w-sm text-lg font-medium leading-relaxed text-tertiary/90 sm:text-xl">
+            Think clearer.
+            <br />
+            Focus deeper. Flow further.
+          </p>
+        </div>
+      </div>
       <div className="flex flex-1 items-center justify-center bg-tertiary p-4">
         <div className="w-full max-w-lg overflow-hidden rounded-xl border-4 border-white bg-white shadow-2xl">
           <div className="rounded-2xl bg-tertiary/30 px-7 py-5 sm:px-9 sm:py-6">
@@ -108,6 +165,22 @@ export default function Login() {
                     autoComplete="off"
                     className="h-full min-w-0 flex-1 bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
                   />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="26"
+                    className="invisible"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6f1d1b"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
                 </div>
                 {errors.email && <p>{errors.email.join(",")}</p>}
               </div>
@@ -140,7 +213,7 @@ export default function Login() {
 
                   <input
                     id="input-password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     placeholder="* * * * * * *"
                     onChange={(e) => {
@@ -149,6 +222,13 @@ export default function Login() {
                     }}
                     className="h-full  flex-1 justify-center bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((state) => !state)}
+                    className="shrink-0 text-accent transition cursor-pointer rounded-4xl p-1"
+                  >
+                    {getEyeIcon()}
+                  </button>
                 </div>
                 {errors.password && <p>{errors.password[0]}</p>}
               </div>
