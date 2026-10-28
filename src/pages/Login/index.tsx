@@ -38,10 +38,11 @@ export default function Login() {
         setErrors(result.error.flatten().fieldErrors);
         return;
       }
+      throw new Error();
       //need to make a backend call here
       console.log(result.data);
     } catch (error) {
-      console.error("Login failed:", error);
+      alert("Something is Wrong with Backend");
     } finally {
       setLoading(false);
     }
