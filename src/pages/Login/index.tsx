@@ -1,4 +1,47 @@
+import { useState, type FormEvent } from "react";
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  email: z.email({ error: "Enter a valid email address" }),
+
+  password: z
+    .string()
+    .min(1, { error: "Password is required" })
+    .min(8, { error: "Password must be at least 8 characters long" }),
+});
+
 export default function Login() {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errors, setErrors] = useState<object>({});
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+    setErrors({});
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const result = loginSchema.safeParse({
+        email,
+        password,
+      });
+
+      if (!result.success) {
+        setErrors(result.error.flatten().fieldErrors);
+        return;
+      }
+      //need to make a backend call here
+      console.log(result.data);
+    } catch (error) {
+      console.error("Login failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-row bg-primary">
       <div className="flex-1">Image</div>
@@ -16,7 +59,7 @@ export default function Login() {
               Sign in to access your dashboard
             </p>
 
-            <form className="mt-3 space-y-3">
+            <form onSubmit={handleSubmit} className="mt-3 space-y-3">
               {/* Email */}
               <div>
                 <label
@@ -45,7 +88,10 @@ export default function Login() {
 
                   <input
                     id="input-email"
-                    type="text"
+                    type="email"
+                    formNoValidate
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="yourname@example.com"
                     autoComplete="off"
                     className="h-full min-w-0 flex-1 bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
@@ -83,6 +129,7 @@ export default function Login() {
                     id="input-password"
                     type="password"
                     placeholder="* * * * * * *"
+                    onChange={(e) => setPassword(e.target.value)}
                     className="h-full  flex-1 justify-center bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
                   />
                 </div>
@@ -90,8 +137,9 @@ export default function Login() {
 
               {/* Sign in */}
               <button
-                type="button"
-                className="h-10 w-full mt-5 rounded-full bg-primary text-sm font-semibold text-tertiary shadow-sm transition hover:bg-primary/90"
+                type="submit"
+                disabled={loading}
+                className="mt-5 h-10 w-full cursor-pointer rounded-full bg-primary text-sm font-semibold text-tertiary shadow-sm transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-primary"
               >
                 Sign In
               </button>
