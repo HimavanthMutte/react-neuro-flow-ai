@@ -10,11 +10,16 @@ export const loginSchema = z.object({
     .min(8, { error: "Password must be at least 8 characters long" }),
 });
 
+type LoginErrors = {
+  email?: string[];
+  password?: string[];
+};
+
 export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [errors, setErrors] = useState<object>({});
+  const [errors, setErrors] = useState<LoginErrors>({});
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -91,12 +96,19 @@ export default function Login() {
                     type="email"
                     formNoValidate
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setErrors((state) => ({
+                        email: undefined,
+                        ...state,
+                      }));
+                    }}
                     placeholder="yourname@example.com"
                     autoComplete="off"
                     className="h-full min-w-0 flex-1 bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
                   />
                 </div>
+                {errors.email && <p>{errors.email.join(",")}</p>}
               </div>
 
               {/* Password */}
@@ -128,11 +140,16 @@ export default function Login() {
                   <input
                     id="input-password"
                     type="password"
+                    value={password}
                     placeholder="* * * * * * *"
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((state) => ({ ...state, password: undefined }));
+                    }}
                     className="h-full  flex-1 justify-center bg-transparent text-sm text-primary outline-none placeholder:text-primary/40"
                   />
                 </div>
+                {errors.password && <p>{errors.password[0]}</p>}
               </div>
 
               {/* Sign in */}
