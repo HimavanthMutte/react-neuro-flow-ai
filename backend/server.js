@@ -10,6 +10,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 app.use(cors());
 app.use(express.json());
 
+const users_list = [];
+
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -26,6 +28,40 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
+app.post('/api/register', async (req, res)=>{
+  try{
+    const {username, email, password} = req.body;
+    if(!username || !email || !password){
+      return res.status(400).json({message: "Enter all the details correctly"});
+    }
+
+    const checkUser = users_list.find(u => u.username === username);
+    if(checkUser){
+      res.status(401).json({message: "Username already existed."});
+    }
+    const checkEmail = users_list.find(u => u.email === email);
+    if(checkEmail){
+      res.status(401).json({message: "Email already existed."});
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const new_user = {
+      id: Date.now().toString(),
+      username,
+      email,
+      password: hashedPassword
+    };
+    users_list.push(new_user);
+    return res.status(201).json({message: "User has created."});
+    
+  }catch(e){
+    return res.status(500).json({message : "Internal server error."});
+  }
+
+});
+
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -33,12 +69,13 @@ app.post('/api/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
-    const user = {"email": "test@user.com", "password": "testuser"}
-
+    // const user = {"email": "test@user.com", "password": "testuser"}
+    const user = users_list.find(u=>u.email === email);
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
-    const isMatch = password === user.password;
+    // const isMatch = password === user.password;
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid password.' });
     }
